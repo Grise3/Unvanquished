@@ -96,7 +96,7 @@ public:
 
 		if ( event == "focus" )
 		{
-			CG_Rocket_EnableCursor( false );
+			CG_Rocket_EnableCursor( true );
 		}
 
 		{
