@@ -4,10 +4,44 @@
 	<style>
 		.chat {
 			position: absolute;
-			top: 50%;
+			bottom: 04%;
 			width: 100%;
-			left: 4em;
-			background-color: rgba(40, 40, 40, 40);
+			left: 0em;
+			background-color: rgba(40, 40, 40, 100);
+		}
+		.menu {
+			position: absolute;
+			bottom: 1%;
+			width: auto;
+			left: 0em;
+/* 			background-color: rgba(40, 40, 40, 100); */
+		}
+		.history {
+			position: absolute;
+			bottom: 7%;
+			width: 40%;
+			height: 60%;
+			left: 0em;
+			background-color: rgba(40, 40, 40, 100);
+		}
+		.chat-buttons {
+			border-radius: 5px;
+			border: 2px;
+			background-color: #4a4a4a;
+			border-color: #19acb4;
+			text-align: center;
+			padding: 0.1em 1em 0.3em;
+			margin: 0.1em;
+		}
+
+		.chat-buttons:hover {
+			border-radius: 5px;
+			border: 2px;
+			background-color: #4a4a4a;
+			border-color: #00f2ff;
+			text-align: center;
+			padding: 0.1em 1em 0.3em;
+			margin: 0.1em;
 		}
 		body > * {
 			font-size: 1.1em;
@@ -19,13 +53,19 @@
 	<script src="lua/util.lua"></script>
 	<link type="text/rcss" href="menu.rcss" />
 	</head>
-	<body id="ingame_chat" onkeydown="detectEscape(event, document)" onshow='document:GetElementById("chatfield"):Focus()' >
+	<body id="ingame_chat" onkeydown="detectEscape(event, document)" onshow='document:GetElementById("chatfield"):Focus()'>
 	<img class="gradient black" src="/ui/assets/background/black" />
 	<img class="circles" src="/ui/assets/background/circles1" />
 	<img class="circles" src="/ui/assets/background/circles2" />
+	<div class="history">
+		<chat_history/>
+	</div>
 	<div class="chat">
 		<chatType/>
 		<chatfield id="chatfield" onfocus='Events.pushevent("setChatCommand", event)' />
+	</div>
+	<div class="menu">
+		<a onclick='Events.pushcmd("exec message_public")' class="chat-buttons" style="color:#00ff07;">Global Chat</a>&nbsp;&nbsp;<a onclick='Events.pushcmd("exec message_team")' class="chat-buttons" style="color:#00e1ff;">Team Chat</a>&nbsp;&nbsp;<a onclick='Events.pushcmd("exec message_admin")' class="chat-buttons" style="color:#ee00ff;">Admin Chat</a>
 	</div>
 	</body>
 </rml>
