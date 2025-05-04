@@ -325,6 +325,96 @@ void Rocket_MouseMove( int x, int y )
 	menuContext->ProcessMouseMove( x, y, Rocket_GetKeyModifiers() );
 }
 
+
+struct KeyImageMapping {
+    const char* keyName;
+    const char* imageName;
+};
+
+static const KeyImageMapping keyImageTable[] = {
+	// Controllers
+
+	{ "CONTROLLER_A", "/gfx/input/controller/controller_a.png" },
+	{ "CONTROLLER_B", "/gfx/input/controller/controller_b.png" },
+
+	{ "CONTROLLER_X", "/gfx/input/controller/controller_x.png" },
+	{ "CONTROLLER_Y", "/gfx/input/controller/controller_y.png" },
+	{ "CONTROLLER_BACK", "/gfx/input/controller/controller_back.png" },
+	{ "CONTROLLER_GUIDE", "/gfx/input/controller/controller_guide.png" },
+	{ "CONTROLLER_START", "/gfx/input/controller/controller_start.png" },
+	{ "CONTROLLER_LS", "/gfx/input/controller/controller_ls.png" },
+	{ "CONTROLLER_RS", "/gfx/input/controller/controller_rs.png" },
+	{ "CONTROLLER_LB", "/gfx/input/controller/controller_lb.png" },
+	{ "CONTROLLER_RB", "/gfx/input/controller/controller_rb.png" },
+	{ "CONTROLLER_DPAD_UP", "/gfx/input/controller/controller_dpad_up.png" },
+	{ "CONTROLLER_DPAD_DOWN", "/gfx/input/controller/controller_dpad_down.png" },
+	{ "CONTROLLER_DPAD_LEFT", "/gfx/input/controller/controller_dpad_left.png" },
+	{ "CONTROLLER_DPAD_RIGHT", "/gfx/input/controller/controller_dpad_right.png" },
+	{ "CONTROLLER_LT", "/gfx/input/controller/controller_lt.png" },
+	{ "CONTROLLER_RT", "/gfx/input/controller/controller_rt.png" },
+
+	{ "RIGHT_STICK_UP", "/gfx/input/controller/right_stick_up.png" },
+	{ "RIGHT_STICK_DOWN", "/gfx/input/controller/right_stick_down.png" },
+	{ "RIGHT_STICK_LEFT", "/gfx/input/controller/right_stick_left.png" },
+	{ "RIGHT_STICK_RIGHT", "/gfx/input/controller/right_stick_right.png" },
+	{ "LEFT_STICK_UP", "/gfx/input/controller/left_stick_up.png" },
+	{ "LEFT_STICK_DOWN", "/gfx/input/controller/left_stick_down.png" },
+	{ "LEFT_STICK_LEFT", "/gfx/input/controller/left_stick_left.png" },
+	{ "LEFT_STICK_RIGHT", "/gfx/input/controller/left_stick_right.png" },
+
+	// Mouse
+
+	{"MOUSE1", "/gfx/input/mouse/mouse_left.png" },
+	{"MOUSE2", "/gfx/input/mouse/mouse_right.png" },
+	{"MOUSE3", "/gfx/input/mouse/mouse_scroll.png" },
+	/*{"", "/gfx/input/mouse/mouse_scroll_down.png" },
+	{"", "/gfx/input/mouse/mouse_scroll_up.png" },*/
+
+	// Keyboard
+
+	{ "CAPSLOCK", "/gfx/input/keyboard/capslock.png" },
+	{ "TAB", "/gfx/input/keyboard/tab.png" },
+	{ "SPACE", "/gfx/input/keyboard/space.png" },
+	{ "END", "/gfx/input/keyboard/end.png" },
+	{ "ENTER", "/gfx/input/keyboard/enter.png" },
+	{ "LEFTARROW", "/gfx/input/keyboard/leftarrow.png" },
+	{ "RIGHTARROW", "/gfx/input/keyboard/rightarrow.png" },
+	{ "DOWNARROW", "/gfx/input/keyboard/downarrow.png" },
+	{ "UPARROW", "/gfx/input/keyboard/uparrow.png" },
+	{ "PGUP", "/gfx/input/keyboard/pgup.png" },
+	{ "PGDN", "/gfx/input/keyboard/pgdb.png" },
+	{ "CTRL", "/gfx/input/keyboard/ctrl.png" },
+	{ "ALT", "/gfx/input/keyboard/alt.png" },
+	{ "SHIFT", "/gfx/input/keyboard/shift.png" },
+	{ "BACKSPACE", "/gfx/input/keyboard/backspace.png" },
+	{ "KP_MINUS", "/gfx/input/keyboard/kp/kp_minus.png" },
+	{ "KP_NUMLOCK", "/gfx/input/keyboard/kp/kp_numlock.png" },
+	{ "KP_PLUS", "/gfx/input/keyboard/kp/kp_plus.png" },
+	{ "KP_SLASH", "/gfx/input/keyboard/kp/kp_slash.png" },
+	{ "KP_STAR", "/gfx/input/keyboard/kp/kp_star.png" },
+	{ "KP_1", "/gfx/input/keyboard/kp/kp_1.png" },
+	{ "KP_2", "/gfx/input/keyboard/kp/kp_2.png" },
+	{ "KP_PGDN", "/gfx/input/keyboard/kp/kp_pgdn.png" },
+	{ "KP_LEFTARROW", "/gfx/input/keyboard/kp/kp_leftarrow.png" },
+	{ "KP_5", "/gfx/input/keyboard/kp/kp_5.png" },
+	{ "KP_RIGHTARROW", "/gfx/input/keyboard/kp/kp_rightarrow.png" },
+	{ "KP_HOME", "/gfx/input/keyboard/kp/kp_home.png" },
+	{ "KP_8", "/gfx/input/keyboard/kp/kp_8.png" },
+	{ "KP_PGUP", "/gfx/input/keyboard/kp/kp_pgup.png" },
+
+};
+
+static const int keyImageTableSize = sizeof(keyImageTable) / sizeof(keyImageTable[0]);
+
+const char* FindImageForKeyName(const std::string& keyName) {
+    for (int i = 0; i < keyImageTableSize; i++) {
+        if (keyName == keyImageTable[i].keyName) {
+            return keyImageTable[i].imageName;
+        }
+    }
+    return nullptr;
+}
+
 /*
 ================
 CG_KeyBinding
@@ -332,34 +422,46 @@ CG_KeyBinding
 The team argument corresponds to Keyboard::BindTeam, not team_t
 ================
 */
-std::string CG_KeyBinding( const char* bind, int team )
+std::string CG_KeyBinding(const char* bind, int team)
 {
-	std::vector<Keyboard::Key> keys = bind == TOGGLE_CONSOLE_COMMAND
-	                                  ? trap_Key_GetConsoleKeys()
-	                                  : trap_Key_GetKeysForBinds( team, {bind} )[0];
+    std::vector<Keyboard::Key> keys = bind == TOGGLE_CONSOLE_COMMAND
+                                      ? trap_Key_GetConsoleKeys()
+                                      : trap_Key_GetKeysForBinds(team, {bind})[0];
 
-	if ( keys.empty() )
-	{
-		return _( "Unbound" );
-	}
+    if (keys.empty())
+    {
+        return _("Unbound");
+    }
 
-	std::string keyNames;
+    std::string keyNames;
 
-	for ( Keyboard::Key key : keys )
-	{
-		if ( key == keys.front() )
-		{
-			keyNames = CG_KeyDisplayName( key );
-		}
-		else if ( key == keys.back() )
-		{
-			keyNames = Str::Format( _("%s or %s"), keyNames, CG_KeyDisplayName( key ) );
-		}
-		else
-		{
-			keyNames = Str::Format( _("%s, %s"), keyNames, CG_KeyDisplayName( key ) );
-		}
-	}
+    for (Keyboard::Key key : keys)
+    {
+        std::string keyName = CG_KeyDisplayName(key);
 
-	return keyNames;
+        const char* imageName = FindImageForKeyName(keyName);
+
+        std::string keyRML;
+        if (imageName) {
+            keyRML = Str::Format("<img src=\"%s\" width=\"28\" height=\"25\" alt=\"%s\" />", imageName, keyName.c_str());
+        } else {
+            keyRML = keyName;
+        }
+
+        if (key == keys.front())
+        {
+            keyNames = keyRML;
+        }
+        else if (key == keys.back())
+        {
+            keyNames = Str::Format(_("<span style=\"font-size:20px\">%s or %s</span>"), keyNames.c_str(), keyRML.c_str());
+        }
+        else
+        {
+            keyNames = Str::Format(_("%s, %s"), keyNames.c_str(), keyRML.c_str());
+        }
+    }
+
+    return keyNames;
 }
+

@@ -105,7 +105,7 @@ public:
 		else if ( rocketInfo.realtime >= nextKeyUpdateTime && team >= 0 && !cmd.empty() )
 		{
 			nextKeyUpdateTime = rocketInfo.realtime + KEY_BINDING_REFRESH_INTERVAL_MS;
-			SetInnerRML( CG_EscapeHTMLText( CG_KeyBinding( cmd.c_str(), team ) ).c_str() );
+			SetInnerRML( CG_KeyBinding( cmd.c_str(), team ) );
 		}
 	}
 
